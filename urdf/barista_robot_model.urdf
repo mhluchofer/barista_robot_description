@@ -584,28 +584,29 @@
     <gazebo reference="laser_scan_frame">
         <sensor name="sensor_ray" type="ray">
             <pose>0 0 0 0 0 0</pose>
-            <ray>
-            <scan>
-                <horizontal>
-                <samples>720</samples>
-                <resolution>1.0</resolution>
-                <min_angle>-3.14</min_angle>
-                <max_angle>3.14</max_angle>
-                </horizontal>
-            </scan>
-            <range>
-                <min>0.1</min>
-                <max>10.0</max>
-            </range>
-            </ray>
             <always_on>true</always_on>
             <visualize>true</visualize>
             <update_rate>100.0</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>720</samples>
+                        <resolution>1.0</resolution>
+                        <min_angle>-3.14</min_angle>
+                        <max_angle>3.14</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.1</min>
+                    <max>10.0</max>
+                </range>
+            </ray>
             <plugin name="laser" filename="libgazebo_ros_ray_sensor.so">
-            <ros>
-                <remapping>~/out:=scan</remapping>
-            </ros>
-            <output_type>sensor_msgs/LaserScan</output_type>
+                <ros>
+                    <remapping>~/out:=scan</remapping>
+                </ros>
+                <output_type>sensor_msgs/LaserScan</output_type>
+                <frame_name>laser_scan_frame</frame_name>
             </plugin>
         </sensor>
 	</gazebo>
