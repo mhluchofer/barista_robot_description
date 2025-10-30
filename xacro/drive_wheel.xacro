@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+    <xacro:property name="drive_wheel_radius" value="0.0352"/>
+    <xacro:property name="drive_wheel_width" value="0.0206"/>
+    <xacro:property name="drive_wheel_mass" value="0.5" />
+
+    <!-- Drive Wheel Macro -->
+    <xacro:macro name="drive_wheel" params="name parent xyz">
+        <link name="${name}">
+            <visual>
+                <origin xyz="0 0 0" rpy="1.5707 0 0"/>
+                <geometry>
+                    <cylinder length="${drive_wheel_width}" radius="${drive_wheel_radius}"/>
+                </geometry>
+                <material name="black"/>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="1.5707 0 0"/>
+                <geometry>
+                    <cylinder length="${drive_wheel_width}" radius="${drive_wheel_radius}"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <origin xyz="0 0 0" rpy="1.5707 0 0"/>
+                <mass value="${drive_wheel_mass}"/>
+                <inertia 
+                    ixx="${(1.0/4.0)*drive_wheel_mass*drive_wheel_radius*drive_wheel_radius + (1.0/12.0)*drive_wheel_mass*drive_wheel_width*drive_wheel_width}" 
+                    ixy="0" ixz="0" 
+                    iyy="${(1.0/4.0)*drive_wheel_mass*drive_wheel_radius*drive_wheel_radius + (1.0/12.0)*drive_wheel_mass*drive_wheel_width*drive_wheel_width}" iyz="0" 
+                    izz="${(1.0/2.0)*drive_wheel_mass*drive_wheel_radius*drive_wheel_radius}"/>
+            </inertial>
+        </link>
+
+        <gazebo reference="${name}">
+            <kp>1000000000000000000000000000.0</kp>
+            <kd>1000000000000000000000000000.0</kd>
+            <mu1>0.8</mu1>
+            <mu2>0.6</mu2>
+            <material>Gazebo/Black</material>
+        </gazebo>
+
+        <joint name="${name}_joint" type="continuous">
+            <origin xyz="${xyz}" rpy="0 0 0" />
+            <parent link="${parent}" />
+            <child link="${name}" />
+            <axis xyz="0 1 0" />
+            <limit effort="10000" velocity="1000"/>
+            <dynamics damping="0.2" friction="1.0"/>
+        </joint>
+    </xacro:macro>
+</robot>

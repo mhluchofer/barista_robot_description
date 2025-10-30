@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+    <xacro:property name="caster_axle_radius" value="0.0045"/>
+    <xacro:property name="caster_axle_length" value="0.001"/>
+    <xacro:property name="caster_axle_mass" value="0.001"/>
+
+    <xacro:property name="caster_wheel_radius" value="0.025"/>
+    <xacro:property name="caster_wheel_mass" value="0.25"/>
+
+    <!-- Caster Wheel Macro -->
+    <xacro:macro name="caster_wheel" params="name xyz parent">
+        <link name="${name}_yaw_link">
+            <visual>
+                <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+                <geometry>          
+                  <cylinder length="${caster_axle_length}" radius="${caster_axle_radius}"/>
+                </geometry>
+                <material name="blue"/>
+            </visual>
+
+            <collision>
+                <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+                <geometry>
+                   <cylinder length="${caster_axle_length}" radius="${caster_axle_radius}"/>
+                </geometry>
+            </collision>
+
+            <inertial>
+                <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+                <mass value="${caster_axle_mass}"/>
+                <inertia 
+                    ixx="${(1.0/12.0)*caster_axle_mass*(3*caster_axle_radius*caster_axle_radius + caster_axle_length*caster_axle_length)}" 
+                    ixy="0" ixz="0" 
+                    iyy="${(1.0/12.0)*caster_axle_mass*(3*caster_axle_radius*caster_axle_radius + caster_axle_length*caster_axle_length)}" iyz="0" 
+                    izz="${(1.0/2.0)*caster_axle_mass*caster_axle_radius*caster_axle_radius}"/>
+            </inertial>
+        </link>
+
+        <gazebo reference="${name}_yaw_link">
+            <material>Gazebo/Blue</material>
+        </gazebo>
+
+        <joint name="${name}_yaw_joint" type="continuous">
+            <origin xyz="${xyz}" rpy="0 0 0" />
+            <parent link="${parent}" />
+            <child link="${name}_yaw_link" />
+            <axis xyz="0 0 1" />
+            <limit effort="1000.0" velocity="100.0" />
+            <dynamics damping="0.00" friction="0.1"/>
+        </joint>
+
+
+        <link name="${name}_roll_link">
+            <visual>
+                <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+                <geometry>
+                    <cylinder length="${caster_axle_length}" radius="${caster_axle_radius}"/>
+                </geometry>
+                <material name="red"/>
+            </visual>
+
+            <collision>
+                <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+                <geometry>
+                    <cylinder length="${caster_axle_length}" radius="${caster_axle_radius}"/>
+                </geometry>
+            </collision>
+
+            <inertial>
+                <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+                <mass value="${caster_axle_mass}"/>
+                <inertia 
+                    ixx="${(1.0/12.0)*caster_axle_mass*(3*caster_axle_radius*caster_axle_radius + caster_axle_length*caster_axle_length)}" 
+                    ixy="0" ixz="0" 
+                    iyy="${(1.0/12.0)*caster_axle_mass*(3*caster_axle_radius*caster_axle_radius + caster_axle_length*caster_axle_length)}" iyz="0" 
+                    izz="${(1.0/2.0)*caster_axle_mass*caster_axle_radius*caster_axle_radius}"/>
+            </inertial>
+        </link>
+        <gazebo reference="${name}_roll_link">
+            <material>Gazebo/Red</material>
+        </gazebo>
+
+        <joint name="${name}_roll_joint" type="continuous">
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <parent link="${name}_yaw_link" />
+            <child link="${name}_roll_link" />
+            <axis xyz="1 0 0" />
+            <limit effort="1000.0" velocity="100.0" />
+            <dynamics damping="0.00" friction="0.1"/>
+        </joint>
+
+        <link name="${name}_pitch_link">
+            <visual>
+                <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+                <geometry>
+                    <sphere radius="${caster_wheel_radius}"/>
+                </geometry>
+                <material name="green_dark"/>
+            </visual>
+
+            <collision>
+                <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+                <geometry>
+                    <sphere radius="${caster_wheel_radius}"/>
+                </geometry>
+            </collision>
+
+            <inertial>
+                <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+                <mass value="${caster_wheel_mass}"/>
+                <inertia 
+                    ixx="${(2.0/5.0)*caster_wheel_mass*caster_wheel_radius*caster_wheel_radius}" 
+                    ixy="0" ixz="0" 
+                    iyy="${(2.0/5.0)*caster_wheel_mass*caster_wheel_radius*caster_wheel_radius}" iyz="0" 
+                    izz="${(2.0/5.0)*caster_wheel_mass*caster_wheel_radius*caster_wheel_radius}"/>
+            </inertial>
+        </link>
+
+        <gazebo reference="${name}_pitch_link">
+            <kp>1000000000000000000000000000.0</kp>
+            <kd>1000000000000000000000000000.0</kd>
+            <mu1>0.2</mu1>
+            <mu2>0.2</mu2>
+            <material>Gazebo/Green</material>
+        </gazebo>
+
+        <joint name="${name}_pitch_joint" type="continuous">
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <parent link="${name}_roll_link" />
+            <child link="${name}_pitch_link" />
+            <axis xyz="0 1 0" />
+            <limit effort="1000.0" velocity="100.0" />
+            <dynamics damping="0.00" friction="0.1"/>
+        </joint>
+
+    </xacro:macro>
+</robot>
