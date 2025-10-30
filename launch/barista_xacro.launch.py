@@ -5,6 +5,8 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from launch.substitutions import Command
 from ament_index_python.packages import get_package_share_directory, get_package_prefix
+from launch.actions import IncludeLaunchDescription, RegisterEventHandler
+from launch.event_handlers import OnProcessExit
 
 def generate_launch_description():
     package_name = "barista_robot_description"
@@ -28,12 +30,24 @@ def generate_launch_description():
         parameters=[{"use_sim_time": True, "robot_description": robot_description}],
     )
 
+    # Nodo RViz
+    rviz_config = os.path.join(pkg_share, "rviz", "urdf_vis.rviz")
+    rviz_node = Node(
+        package="rviz2",
+        executable="rviz2",
+        name="rviz2",
+        output="screen",
+        parameters=[{"use_sim_time": True}],
+        arguments=["-d", rviz_config],
+    )
+
     # Lanza Gazebo
     gazebo_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory("gazebo_ros"), "launch", "gazebo.launch.py")
         )
     )
+
 
     # Spawnea el robot en Gazebo
     spawn_entity_node = Node(
@@ -49,8 +63,17 @@ def generate_launch_description():
         output="screen",
     )
 
+    # Retraso: lanzar RViz después de spawnear el robot
+    delayed_rviz = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=spawn_entity_node,
+            on_exit=[rviz_node],
+        )
+    )
+
     return LaunchDescription([
         gazebo_launch,
         robot_state_publisher_node,
         spawn_entity_node,
+        delayed_rviz,
     ])
