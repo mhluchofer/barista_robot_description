@@ -12,6 +12,7 @@ find_package(ament_cmake REQUIRED)
 # find_package(<dependency> REQUIRED)
 find_package(xacro REQUIRED)
 find_package(urdf REQUIRED)
+find_package(gazebo_ros REQUIRED)
 
 install( DIRECTORY
 	launch
